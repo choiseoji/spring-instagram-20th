@@ -2,12 +2,14 @@ package com.ceos20.instagram.post.domain;
 
 import com.ceos20.instagram.user.domain.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
+@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
 

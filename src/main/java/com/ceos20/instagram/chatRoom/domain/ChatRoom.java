@@ -2,10 +2,12 @@ package com.ceos20.instagram.chatRoom.domain;
 
 import com.ceos20.instagram.user.domain.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
+@Builder
+@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom {
 
