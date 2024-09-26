@@ -24,4 +24,14 @@ public class User {
     private String email;
 
     private String imageUrl;
+
+
+    // user 정보 수정
+    public void updateInfo(String username, String nickname, String password, String email, String imageUrl) {
+        this.username = username;
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+        this.imageUrl = imageUrl;
+    }
 }
