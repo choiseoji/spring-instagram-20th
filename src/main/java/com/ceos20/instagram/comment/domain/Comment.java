@@ -39,6 +39,10 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment")
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
     private List<Comment> childrenComment = new ArrayList<>();
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

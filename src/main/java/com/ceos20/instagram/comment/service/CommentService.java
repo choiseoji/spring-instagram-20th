@@ -3,6 +3,7 @@ package com.ceos20.instagram.comment.service;
 import com.ceos20.instagram.comment.domain.Comment;
 import com.ceos20.instagram.comment.dto.CreateChildCommentRequest;
 import com.ceos20.instagram.comment.dto.CreateCommentRequest;
+import com.ceos20.instagram.comment.dto.UpdateCommentRequest;
 import com.ceos20.instagram.comment.repository.CommentRepository;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.repository.PostRepository;
@@ -47,5 +48,21 @@ public class CommentService {
                 .parentComment(parentComment)
                 .build();
         commentRepository.save(comment);
+    }
+
+    // 댓글 수정
+    public void updateContent(UpdateCommentRequest updateCommentRequest) {
+
+        Comment comment = commentRepository.findById(updateCommentRequest.getCommentId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
+        comment.updateContent(updateCommentRequest.getContent());
+        commentRepository.save(comment);
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
+        commentRepository.delete(comment);
     }
 }
