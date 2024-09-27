@@ -16,10 +16,11 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    private String username;
+    private String username;      // ex) 최서지
 
     @NotNull
-    private String nickname;
+    @Column(unique = true)
+    private String nickname;      // ex) @__seojii
 
     @NotNull
     private String password;
