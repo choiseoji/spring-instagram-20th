@@ -3,6 +3,7 @@ package com.ceos20.instagram.post.domain;
 import com.ceos20.instagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,9 +21,14 @@ public class Post {
 
     private String content;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
