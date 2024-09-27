@@ -4,6 +4,7 @@ import com.ceos20.instagram.chatRoom.domain.ChatRoom;
 import com.ceos20.instagram.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ public class Message {
     @Column(name = "message_id")
     private Long id;
 
+    @NotNull
     private String content;
 
     private LocalDateTime createdAt;

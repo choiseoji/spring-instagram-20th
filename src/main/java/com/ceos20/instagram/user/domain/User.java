@@ -2,6 +2,7 @@ package com.ceos20.instagram.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Builder
@@ -17,8 +18,10 @@ public class User {
 
     private String username;
 
+    @NotNull
     private String nickname;
 
+    @NotNull
     private String password;
 
     private String email;

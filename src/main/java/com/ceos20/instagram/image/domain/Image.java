@@ -3,6 +3,7 @@ package com.ceos20.instagram.image.domain;
 import com.ceos20.instagram.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Builder
@@ -16,8 +17,10 @@ public class Image {
     @Column(name = "image_id")
     private Long id;
 
+    @NotNull
     private String imageUrl;
 
+    @NotNull
     private Long index;
 
     @ManyToOne(fetch = FetchType.LAZY)
