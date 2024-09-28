@@ -64,7 +64,7 @@ public class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
-        GetUserInfoResponse getUserInfoResponse = userService.getUserInfo(user.getId());
+        GetUserInfoResponse getUserInfoResponse = userService.getUserInfoById(user.getId());
 
         // then
         assertEquals(user.getUsername(), getUserInfoResponse.getUsername());

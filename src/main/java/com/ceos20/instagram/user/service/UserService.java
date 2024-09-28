@@ -41,7 +41,7 @@ public class UserService {
     }
 
     // user 정보 조회
-    public GetUserInfoResponse getUserInfo(Long userId) {
+    public GetUserInfoResponse getUserInfoById(Long userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 user 입니다."));
