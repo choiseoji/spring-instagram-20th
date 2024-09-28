@@ -27,11 +27,7 @@ public class CommentService {
         Post post = postRepository.findById(createCommentRequest.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
 
-        Comment comment = Comment.builder()
-                .content(createCommentRequest.getContent())
-                .post(post)
-                .author(user)
-                .build();
+        Comment comment = createCommentRequest.toEntity(post, user);
         commentRepository.save(comment);
     }
 
@@ -45,12 +41,7 @@ public class CommentService {
         Comment parentComment = commentRepository.findById(createChildCommentRequest.getParentCommentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
 
-        Comment comment = Comment.builder()
-                .content(createChildCommentRequest.getContent())
-                .post(post)
-                .author(user)
-                .parentComment(parentComment)
-                .build();
+        Comment comment = createChildCommentRequest.toEntity(parentComment, post, user);
         commentRepository.save(comment);
     }
 
