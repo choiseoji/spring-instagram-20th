@@ -57,7 +57,7 @@ public class PostService {
     }
 
     // id로 게시글 조회
-    public GetPostResponse getPostBy(Long postId) {
+    public GetPostResponse getPostById(Long postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
