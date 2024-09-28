@@ -3,6 +3,7 @@ package com.ceos20.instagram.postLike.service;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.postLike.domain.PostLike;
+import com.ceos20.instagram.postLike.dto.GetUserLikeResponse;
 import com.ceos20.instagram.postLike.repository.PostLikeRepository;
 import com.ceos20.instagram.user.domain.User;
 import com.ceos20.instagram.user.repository.UserRepository;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +55,15 @@ public class PostLikeService {
                 .user(user)
                 .build();
         postLikeRepository.save(postLike);
+    }
+
+    // 해당 post에 좋아요 누른 user 반환
+    public List<GetUserLikeResponse> getUsersWhoLikePost(Long postId) {
+
+        List<User> users = postLikeRepository.findUserWhoLikePostByPostId(postId);
+
+        return users.stream()
+                .map(user -> GetUserLikeResponse.fromEntity(user))
+                .collect(Collectors.toList());
     }
 }
