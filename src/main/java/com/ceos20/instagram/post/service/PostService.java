@@ -4,11 +4,15 @@ import com.ceos20.instagram.image.domain.Image;
 import com.ceos20.instagram.image.repository.ImageRepository;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.dto.CreatePostRequest;
+import com.ceos20.instagram.post.dto.GetPostResponse;
 import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +27,14 @@ public class PostService {
     public void createPost(CreatePostRequest createPostRequest, User user) {
 
         // 글 저장
-        Post post = Post.builder()
-                .author(user)
-                .content(createPostRequest.getContent())
-                .build();
+        Post post = Post.toEntity(createPostRequest, user);
         postRepository.save(post);
 
         // 이미지 저장
-        for (CreatePostRequest.Image image : createPostRequest.getImages()) {
-            Image newImage = Image.builder()
-                    .post(post)
-                    .imageUrl(image.getImageUrl())
-                    .index(image.getIndex())
-                    .build();
-            imageRepository.save(newImage);
-        }
+        List<Image> images = createPostRequest.getImages().stream()
+                .map(image -> Image.toEntity(post, image))
+                .collect(Collectors.toList());
+        imageRepository.saveAll(images);
     }
 
     // 게시글 본문 수정
@@ -57,5 +54,14 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
         postRepository.delete(post);
+    }
+
+    // id로 게시글 조회
+    public GetPostResponse getPostBy(Long postId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+
+        return GetPostResponse.fromEntity(post);
     }
 }
