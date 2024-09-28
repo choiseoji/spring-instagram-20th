@@ -64,4 +64,14 @@ public class PostService {
 
         return GetPostResponse.fromEntity(post);
     }
+
+    // 특정 user가 작성한 게시글 리스트 반환
+    public List<GetPostResponse> getPostsByUser(User user) {
+
+        List<Post> posts = postRepository.findByAuthor(user);
+
+        return posts.stream()
+                .map(post -> GetPostResponse.fromEntity(post))
+                .collect(Collectors.toList());
+    }
 }
