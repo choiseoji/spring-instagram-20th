@@ -50,10 +50,7 @@ public class PostLikeService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
 
-        PostLike postLike = PostLike.builder()
-                .post(post)
-                .user(user)
-                .build();
+        PostLike postLike = PostLike.toEntity(user, post);
         postLikeRepository.save(postLike);
     }
 
