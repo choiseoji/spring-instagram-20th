@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +29,7 @@ public class FollowService {
         User friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
 
-        Follow follow = Follow.builder()
-                .fromUser(user)
-                .toUser(friend)
-                .build();
+        Follow follow = Follow.toEntity(user, friend);
         followRepository.save(follow);
     }
 
@@ -40,15 +38,9 @@ public class FollowService {
 
         List<User> findFollowers = followRepository.findByToUser(user);
 
-        List<GetFollowerResponse> followerResponses = new ArrayList<>();
-        for (User follower : findFollowers) {
-            GetFollowerResponse followerResponse = GetFollowerResponse.builder()
-                    .userId(follower.getId())
-                    .nickname(follower.getNickname())
-                    .build();
-            followerResponses.add(followerResponse);
-        }
-        return followerResponses;
+        return findFollowers.stream()
+                .map(follower -> GetFollowerResponse.fromEntity(follower))
+                .collect(Collectors.toList());
     }
 
     // 내가 팔로우하는 사람들 리스트 반환
@@ -56,14 +48,8 @@ public class FollowService {
 
         List<User> findFollowings = followRepository.findByFromUser(user);
 
-        List<GetFollowingResponse> followingResponses = new ArrayList<>();
-        for (User following : findFollowings) {
-            GetFollowingResponse followingResponse = GetFollowingResponse.builder()
-                    .userId(following.getId())
-                    .nickname(following.getNickname())
-                    .build();
-            followingResponses.add(followingResponse);
-        }
-        return followingResponses;
+        return findFollowings.stream()
+                .map(following -> GetFollowingResponse.fromEntity(following))
+                .collect(Collectors.toList());
     }
 }

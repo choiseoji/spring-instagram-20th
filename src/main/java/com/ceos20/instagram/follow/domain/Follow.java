@@ -23,4 +23,11 @@ public class Follow {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id")
     private User toUser;
+
+    public static Follow toEntity(User fromUser, User toUser) {
+        return Follow.builder()
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .build();
+    }
 }
