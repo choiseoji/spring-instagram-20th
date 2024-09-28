@@ -52,4 +52,15 @@ public class FollowService {
                 .map(following -> GetFollowingResponse.fromEntity(following))
                 .collect(Collectors.toList());
     }
+
+    // 팔로우 관계 삭제
+    @Transactional
+    public void deleteFollow(User user, Long friendId) {
+
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
+
+        Follow follow = followRepository.findByFromUserAndToUser(user, friend);
+        followRepository.delete(follow);
+    }
 }

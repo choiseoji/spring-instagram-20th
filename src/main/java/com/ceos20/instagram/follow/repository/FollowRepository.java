@@ -17,4 +17,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     // fromUser가 팔로우하는 사람들(toUser) 리스트 반환
     @Query("SELECT f.toUser FROM Follow f WHERE f.fromUser = :fromUser")
     List<User> findByFromUser(@Param("fromUser") User fromUser);
+
+    // FromUser과 ToUser로 follow 찾기
+    Follow findByFromUserAndToUser(User fromUser, User toUser);
 }
