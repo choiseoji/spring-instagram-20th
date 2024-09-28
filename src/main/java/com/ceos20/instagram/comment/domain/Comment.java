@@ -41,6 +41,7 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parentComment;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
     private List<Comment> childrenComment = new ArrayList<>();
 
