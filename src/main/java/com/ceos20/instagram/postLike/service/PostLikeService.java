@@ -8,11 +8,13 @@ import com.ceos20.instagram.user.domain.User;
 import com.ceos20.instagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostLikeService {
 
     private final UserRepository userRepository;
@@ -31,11 +33,13 @@ public class PostLikeService {
     }
 
     // 본문 좋아요 삭제
+    @Transactional
     public void deletePostLike(PostLike postLike) {
         postLikeRepository.delete(postLike);
     }
 
     // 본문 좋아요 생성
+    @Transactional
     public void createPostLike(Long postId, Long userId) {
 
         User user = userRepository.findById(userId)

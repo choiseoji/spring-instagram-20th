@@ -8,15 +8,18 @@ import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
 
     // 게시글 생성
+    @Transactional
     public void createPost(CreatePostRequest createPostRequest, User user) {
 
         // 글 저장
@@ -38,6 +41,7 @@ public class PostService {
     }
 
     // 게시글 본문 수정
+    @Transactional
     public void updatePostContent(String content, Long postId) {
 
         Post post = postRepository.findById(postId)
@@ -47,6 +51,7 @@ public class PostService {
     }
 
     // 게시글 삭제
+    @Transactional
     public void deletePost(Long postId) {
 
         Post post = postRepository.findById(postId)

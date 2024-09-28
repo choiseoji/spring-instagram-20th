@@ -6,15 +6,18 @@ import com.ceos20.instagram.user.domain.User;
 import com.ceos20.instagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChatRoomService {
 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
     // 채팅방 생성
+    @Transactional
     public void createChatRoom(Long userId, Long friendId) {
 
         // 나 조회

@@ -8,18 +8,21 @@ import com.ceos20.instagram.user.domain.User;
 import com.ceos20.instagram.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FollowService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
 
     // 팔로우 관계 생성
+    @Transactional
     public void createFollow(User user, Long friendId) {
 
         User friend = userRepository.findById(friendId)
