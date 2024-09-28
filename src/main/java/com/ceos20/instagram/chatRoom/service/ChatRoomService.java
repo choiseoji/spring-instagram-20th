@@ -28,10 +28,7 @@ public class ChatRoomService {
         User friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저 입니다."));
 
-        ChatRoom chatRoom = ChatRoom.builder()
-                .user1(user)
-                .user2(friend)
-                .build();
+        ChatRoom chatRoom = ChatRoom.toEntity(user, friend);
         chatRoomRepository.save(chatRoom);
     }
 }
