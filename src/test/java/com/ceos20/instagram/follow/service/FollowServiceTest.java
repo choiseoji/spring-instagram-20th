@@ -55,7 +55,7 @@ public class FollowServiceTest {
     void getFollowerTest() {
         // given
         List<Member> followers = Arrays.asList(follower1, follower2);
-        when(followRepository.findByToUser(member)).thenReturn(followers);
+        when(followRepository.findByToMember(member)).thenReturn(followers);
 
         // when
         List<GetFollowerResponse> responses = followService.getFollower(member);
@@ -71,7 +71,7 @@ public class FollowServiceTest {
     void getFollowingTest() {
         // given
         List<Member> following = Arrays.asList(follower1, follower2);
-        when(followRepository.findByFromUser(member)).thenReturn(following);
+        when(followRepository.findByFromMember(member)).thenReturn(following);
 
         // when
         List<GetFollowingResponse> responses = followService.getFollowing(member);
