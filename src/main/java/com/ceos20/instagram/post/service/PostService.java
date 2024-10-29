@@ -6,6 +6,7 @@ import com.ceos20.instagram.member.repository.MemberRepository;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.dto.CreatePostRequest;
 import com.ceos20.instagram.post.dto.GetPostResponse;
+import com.ceos20.instagram.post.dto.UpdatePostContentRequest;
 import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -41,11 +42,11 @@ public class PostService {
 
     // 게시글 본문 수정
     @Transactional
-    public void updatePostContent(String content, Long postId) {
+    public void updatePostContent(UpdatePostContentRequest updatePostContentRequest, Long postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
-        post.updateContent(content);
+        post.updateContent(updatePostContentRequest.getContent());
         postRepository.save(post);
     }
 

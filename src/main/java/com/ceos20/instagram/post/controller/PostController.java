@@ -4,6 +4,7 @@ import com.ceos20.instagram.global.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.post.dto.CreatePostRequest;
 import com.ceos20.instagram.post.dto.GetPostResponse;
+import com.ceos20.instagram.post.dto.UpdatePostContentRequest;
 import com.ceos20.instagram.post.service.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,22 @@ public class PostController {
             @Login Member member) {
 
         postService.createPost(createPostRequest, member);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity updatePostContentById(
+            @PathVariable Long postId,
+            @RequestBody UpdatePostContentRequest updatePostContentRequest
+            ) {
+        postService.updatePostContent(updatePostContentRequest, postId);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePostById(@PathVariable Long postId) {
+
+        postService.deletePost(postId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
