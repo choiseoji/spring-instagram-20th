@@ -2,7 +2,7 @@ package com.ceos20.instagram.comment.dto;
 
 import com.ceos20.instagram.comment.domain.Comment;
 import com.ceos20.instagram.post.domain.Post;
-import com.ceos20.instagram.user.domain.User;
+import com.ceos20.instagram.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class CreateCommentRequest {
 
     private Long postId;
 
-    public Comment toEntity(Post post, User author) {
+    public Comment toEntity(Post post, Member author) {
         return Comment.builder()
                 .content(content)
                 .post(post)

@@ -6,7 +6,7 @@ import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.dto.CreatePostRequest;
 import com.ceos20.instagram.post.dto.GetPostResponse;
 import com.ceos20.instagram.post.repository.PostRepository;
-import com.ceos20.instagram.user.domain.User;
+import com.ceos20.instagram.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +24,10 @@ public class PostService {
 
     // 게시글 생성
     @Transactional
-    public void createPost(CreatePostRequest createPostRequest, User user) {
+    public void createPost(CreatePostRequest createPostRequest, Member member) {
 
         // 글 저장
-        Post post = Post.toEntity(createPostRequest, user);
+        Post post = Post.toEntity(createPostRequest, member);
         postRepository.save(post);
 
         // 이미지 저장
@@ -66,9 +66,9 @@ public class PostService {
     }
 
     // 특정 user가 작성한 게시글 리스트 반환
-    public List<GetPostResponse> getPostsByUser(User user) {
+    public List<GetPostResponse> getPostsByUser(Member member) {
 
-        List<Post> posts = postRepository.findByAuthor(user);
+        List<Post> posts = postRepository.findByAuthor(member);
 
         return posts.stream()
                 .map(post -> GetPostResponse.fromEntity(post))

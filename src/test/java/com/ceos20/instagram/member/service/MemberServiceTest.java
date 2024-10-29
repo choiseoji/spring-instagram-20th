@@ -1,9 +1,9 @@
-package com.ceos20.instagram.user.service;
+package com.ceos20.instagram.member.service;
 
-import com.ceos20.instagram.user.domain.User;
-import com.ceos20.instagram.user.dto.GetUserInfoResponse;
-import com.ceos20.instagram.user.dto.SaveUserRequest;
-import com.ceos20.instagram.user.repository.UserRepository;
+import com.ceos20.instagram.member.domain.Member;
+import com.ceos20.instagram.member.dto.GetUserInfoResponse;
+import com.ceos20.instagram.member.dto.SaveUserRequest;
+import com.ceos20.instagram.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,15 +17,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class UserServiceTest {
+public class MemberServiceTest {
 
     @Mock  // userRepository를 mock으로 주입하므로 모의 동작을 설정해야 한다.
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private UserService userService;
 
-    private User testUser;
+    private Member testMember;
 
     @Test
     @DisplayName("유저 저장 테스트")
@@ -37,23 +37,23 @@ public class UserServiceTest {
                 .email("seoji@naver.com")
                 .password("password")
                 .build();
-        User user = saveUserRequest.toEntity();
+        Member member = saveUserRequest.toEntity();
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(memberRepository.save(any(Member.class))).thenReturn(member);
 
         // when
         Long userId = userService.saveUser(saveUserRequest);
 
         // then
-        verify(userRepository, times(1)).save(any(User.class));  // save 메서드가 한번 호출 되었는지 확인
-        assertEquals(user.getId(), userId);  // 반환된 id가 user의 id와 같은지 확인
+        verify(memberRepository, times(1)).save(any(Member.class));  // save 메서드가 한번 호출 되었는지 확인
+        assertEquals(member.getId(), userId);  // 반환된 id가 user의 id와 같은지 확인
     }
 
     @Test
     @DisplayName("유저 정보 조회 테스트")
     public void getUserInfoTest() {
         // given
-        User user = User.builder()
+        Member member = Member.builder()
                 .id(1L)
                 .username("seoji")
                 .nickname("__seoji")
@@ -61,14 +61,14 @@ public class UserServiceTest {
                 .email("seoji@naver.com")
                 .password("password")
                 .build();
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
-        GetUserInfoResponse getUserInfoResponse = userService.getUserInfoById(user.getId());
+        GetUserInfoResponse getUserInfoResponse = userService.getUserInfoById(member.getId());
 
         // then
-        assertEquals(user.getUsername(), getUserInfoResponse.getUsername());
-        assertEquals(user.getNickname(), getUserInfoResponse.getNickname());
-        assertEquals(user.getEmail(), getUserInfoResponse.getEmail());
+        assertEquals(member.getUsername(), getUserInfoResponse.getUsername());
+        assertEquals(member.getNickname(), getUserInfoResponse.getNickname());
+        assertEquals(member.getEmail(), getUserInfoResponse.getEmail());
     }
 }

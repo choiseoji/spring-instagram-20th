@@ -1,10 +1,10 @@
-package com.ceos20.instagram.user.service;
+package com.ceos20.instagram.member.service;
 
-import com.ceos20.instagram.user.domain.User;
-import com.ceos20.instagram.user.dto.GetUserInfoResponse;
-import com.ceos20.instagram.user.dto.SaveUserRequest;
-import com.ceos20.instagram.user.dto.UpdateUserInfoRequest;
-import com.ceos20.instagram.user.repository.UserRepository;
+import com.ceos20.instagram.member.domain.Member;
+import com.ceos20.instagram.member.dto.GetUserInfoResponse;
+import com.ceos20.instagram.member.dto.SaveUserRequest;
+import com.ceos20.instagram.member.dto.UpdateUserInfoRequest;
+import com.ceos20.instagram.member.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,38 +14,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     // user 저장
     @Transactional
     public Long saveUser(SaveUserRequest saveUserRequest) {
 
-        User user = saveUserRequest.toEntity();
-        return userRepository.save(user).getId();
+        Member member = saveUserRequest.toEntity();
+        return memberRepository.save(member).getId();
     }
 
     // user 정보 수정
     @Transactional
-    public Long updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, User user) {
+    public Long updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, Member member) {
 
-        user.updateInfo(
+        member.updateInfo(
                 updateUserInfoRequest.getUsername(),
                 updateUserInfoRequest.getNickname(),
                 updateUserInfoRequest.getPassword(),
                 updateUserInfoRequest.getEmail(),
                 updateUserInfoRequest.getImageUrl()
                 );
-        userRepository.save(user);   // JPA의 변경감지 덕분에 생략 가능하다고 함
+        memberRepository.save(member);   // JPA의 변경감지 덕분에 생략 가능하다고 함
 
-        return user.getId();
+        return member.getId();
     }
 
     // user 정보 조회
     public GetUserInfoResponse getUserInfoById(Long userId) {
 
-        User user = userRepository.findById(userId)
+        Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 user 입니다."));
 
-        return GetUserInfoResponse.fromEntity(user);
+        return GetUserInfoResponse.fromEntity(member);
     }
 }

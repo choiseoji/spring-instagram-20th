@@ -1,6 +1,6 @@
-package com.ceos20.instagram.user.dto;
+package com.ceos20.instagram.member.dto;
 
-import com.ceos20.instagram.user.domain.User;
+import com.ceos20.instagram.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,12 +20,12 @@ public class GetUserInfoResponse {
 
     private String imageUrl;
 
-    public static GetUserInfoResponse fromEntity(User user) {
+    public static GetUserInfoResponse fromEntity(Member member) {
         return GetUserInfoResponse.builder()
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .imageUrl(user.getImageUrl())
+                .username(member.getUsername())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 }

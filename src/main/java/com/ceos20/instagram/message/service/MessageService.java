@@ -6,7 +6,7 @@ import com.ceos20.instagram.message.domain.Message;
 import com.ceos20.instagram.message.dto.CreateMessageRequest;
 import com.ceos20.instagram.message.dto.GetMessageResponse;
 import com.ceos20.instagram.message.repository.MessageRepository;
-import com.ceos20.instagram.user.domain.User;
+import com.ceos20.instagram.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +24,12 @@ public class MessageService {
 
     // message 생성
     @Transactional
-    public void createMessage(CreateMessageRequest createMessageRequest, User user) {
+    public void createMessage(CreateMessageRequest createMessageRequest, Member member) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(createMessageRequest.getRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 chatRoom 입니다."));
 
-        Message message = createMessageRequest.toEntity(user, chatRoom);
+        Message message = createMessageRequest.toEntity(member, chatRoom);
         messageRepository.save(message);
     }
 

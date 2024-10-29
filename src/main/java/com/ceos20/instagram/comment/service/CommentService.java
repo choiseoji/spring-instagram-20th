@@ -8,7 +8,7 @@ import com.ceos20.instagram.comment.dto.UpdateCommentRequest;
 import com.ceos20.instagram.comment.repository.CommentRepository;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.repository.PostRepository;
-import com.ceos20.instagram.user.domain.User;
+import com.ceos20.instagram.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,18 +26,18 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public void createComment(CreateCommentRequest createCommentRequest, User user) {
+    public void createComment(CreateCommentRequest createCommentRequest, Member member) {
 
         Post post = postRepository.findById(createCommentRequest.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
 
-        Comment comment = createCommentRequest.toEntity(post, user);
+        Comment comment = createCommentRequest.toEntity(post, member);
         commentRepository.save(comment);
     }
 
     // 대댓글 작성
     @Transactional
-    public void createChildComment(CreateChildCommentRequest createChildCommentRequest, User user) {
+    public void createChildComment(CreateChildCommentRequest createChildCommentRequest, Member member) {
 
         Post post = postRepository.findById(createChildCommentRequest.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
@@ -45,7 +45,7 @@ public class CommentService {
         Comment parentComment = commentRepository.findById(createChildCommentRequest.getParentCommentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
 
-        Comment comment = createChildCommentRequest.toEntity(parentComment, post, user);
+        Comment comment = createChildCommentRequest.toEntity(parentComment, post, member);
         commentRepository.save(comment);
     }
 
