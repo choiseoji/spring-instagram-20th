@@ -2,6 +2,7 @@ package com.ceos20.instagram.post.service;
 
 import com.ceos20.instagram.image.domain.Image;
 import com.ceos20.instagram.image.repository.ImageRepository;
+import com.ceos20.instagram.member.repository.MemberRepository;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.dto.CreatePostRequest;
 import com.ceos20.instagram.post.dto.GetPostResponse;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PostService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
 
@@ -65,9 +67,11 @@ public class PostService {
         return GetPostResponse.fromEntity(post);
     }
 
-    // 특정 user가 작성한 게시글 리스트 반환
-    public List<GetPostResponse> getPostsByUser(Member member) {
+    // 특정 member가 작성한 게시글 리스트 반환
+    public List<GetPostResponse> getPostsByMemberId(Long memberId) {
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 memberId 입니다."));
         List<Post> posts = postRepository.findByAuthor(member);
 
         return posts.stream()
