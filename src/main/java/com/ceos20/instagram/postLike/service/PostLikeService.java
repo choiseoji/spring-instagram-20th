@@ -24,7 +24,6 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
-    // 본문 좋아요 처리
     public void handlePostLike(Long postId, Long memberId) {
 
         Optional<PostLike> postLike = postLikeRepository.findByMemberIdAndPostId(memberId, postId);
@@ -35,13 +34,11 @@ public class PostLikeService {
         }
     }
 
-    // 본문 좋아요 삭제
     @Transactional
     public void deletePostLike(PostLike postLike) {
         postLikeRepository.delete(postLike);
     }
 
-    // 본문 좋아요 생성
     @Transactional
     public void createPostLike(Long postId, Long memberId) {
 
@@ -54,7 +51,6 @@ public class PostLikeService {
         postLikeRepository.save(postLike);
     }
 
-    // 해당 post에 좋아요 누른 user 반환
     public List<GetUserLikeResponse> getUsersWhoLikePost(Long postId) {
 
         List<Member> members = postLikeRepository.findMemberWhoLikePostByPostId(postId);
