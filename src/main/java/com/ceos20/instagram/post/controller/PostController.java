@@ -20,13 +20,20 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity createPost(
             @RequestBody CreatePostRequest createPostRequest,
             @Login Member member) {
 
         postService.createPost(createPostRequest, member);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GetPostResponse>> getAllPost() {
+
+        List<GetPostResponse> responses = postService.getAllPosts();
+        return ResponseEntity.ok(responses);
     }
 
     @PatchMapping("/{postId}")

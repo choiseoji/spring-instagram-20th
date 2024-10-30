@@ -40,6 +40,14 @@ public class PostService {
         imageRepository.saveAll(images);
     }
 
+    public List<GetPostResponse> getAllPosts() {
+
+        List<Post> allPosts = postRepository.findAll();
+        return allPosts.stream()
+                .map(post -> GetPostResponse.fromEntity(post))
+                .collect(Collectors.toList());
+    }
+
     // 게시글 본문 수정
     @Transactional
     public void updatePostContent(UpdatePostContentRequest updatePostContentRequest, Long postId) {
