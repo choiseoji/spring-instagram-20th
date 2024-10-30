@@ -30,7 +30,7 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GetPostResponse>> getAllPost() {
+    public ResponseEntity<List<GetPostResponse>> getAllPosts() {
 
         List<GetPostResponse> responses = postService.getAllPosts();
         return ResponseEntity.ok(responses);
@@ -60,9 +60,9 @@ public class PostController {
     }
 
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<GetPostResponse>> getPostByMemberId(@PathVariable Long memberId) {
+    public ResponseEntity<List<GetPostResponse>> getAllPostsByMemberId(@PathVariable Long memberId) {
 
-        List<GetPostResponse> responses = postService.getPostsByMemberId(memberId);
+        List<GetPostResponse> responses = postService.getAllPostsByMemberId(memberId);
         return ResponseEntity.ok(responses);
     }
 }

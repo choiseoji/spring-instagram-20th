@@ -25,15 +25,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
 
-    // 게시글 생성
     @Transactional
     public void createPost(CreatePostRequest createPostRequest, Member member) {
 
-        // 글 저장
         Post post = Post.toEntity(createPostRequest, member);
         postRepository.save(post);
 
-        // 이미지 저장
         List<Image> images = createPostRequest.getImages().stream()
                 .map(image -> Image.toEntity(post, image))
                 .collect(Collectors.toList());
@@ -48,7 +45,6 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // 게시글 본문 수정
     @Transactional
     public void updatePostContent(UpdatePostContentRequest updatePostContentRequest, Long postId) {
 
@@ -58,7 +54,6 @@ public class PostService {
         postRepository.save(post);
     }
 
-    // 게시글 삭제
     @Transactional
     public void deletePost(Long postId) {
 
@@ -67,7 +62,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // id로 게시글 조회
     public GetPostResponse getPostById(Long postId) {
 
         Post post = postRepository.findById(postId)
@@ -76,8 +70,7 @@ public class PostService {
         return GetPostResponse.fromEntity(post);
     }
 
-    // 특정 member가 작성한 게시글 리스트 반환
-    public List<GetPostResponse> getPostsByMemberId(Long memberId) {
+    public List<GetPostResponse> getAllPostsByMemberId(Long memberId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 memberId 입니다."));
