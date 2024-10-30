@@ -1,7 +1,6 @@
 package com.ceos20.instagram.comment.service;
 
 import com.ceos20.instagram.comment.domain.Comment;
-import com.ceos20.instagram.comment.dto.CreateChildCommentRequest;
 import com.ceos20.instagram.comment.dto.CreateCommentRequest;
 import com.ceos20.instagram.comment.dto.GetCommentResponse;
 import com.ceos20.instagram.comment.dto.UpdateCommentRequest;
@@ -24,42 +23,44 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    // 댓글 작성
     @Transactional
-    public void createComment(CreateCommentRequest createCommentRequest, Member member) {
+    public void createComment(CreateCommentRequest createCommentRequest, Member author, Long postId) {
 
-        Post post = postRepository.findById(createCommentRequest.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
 
-        Comment comment = createCommentRequest.toEntity(post, member);
+        Comment comment = Comment.builder()
+                .content(createCommentRequest.getContent())
+                .post(post)
+                .author(author)
+                .build();
         commentRepository.save(comment);
     }
 
-    // 대댓글 작성
     @Transactional
-    public void createChildComment(CreateChildCommentRequest createChildCommentRequest, Member member) {
+    public void createChildComment(CreateCommentRequest createCommentRequest, Member author, Long parentCommentId) {
 
-        Post post = postRepository.findById(createChildCommentRequest.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
-
-        Comment parentComment = commentRepository.findById(createChildCommentRequest.getParentCommentId())
+        Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
 
-        Comment comment = createChildCommentRequest.toEntity(parentComment, post, member);
+        Comment comment = Comment.builder()
+                .content(createCommentRequest.getContent())
+                .post(parentComment.getPost())
+                .author(author)
+                .parentComment(parentComment)
+                .build();
         commentRepository.save(comment);
     }
 
-    // 댓글 수정
     @Transactional
-    public void updateContent(UpdateCommentRequest updateCommentRequest) {
+    public void updateContent(UpdateCommentRequest updateCommentRequest, Long commentId) {
 
-        Comment comment = commentRepository.findById(updateCommentRequest.getCommentId())
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글 입니다."));
         comment.updateContent(updateCommentRequest.getContent());
         commentRepository.save(comment);
     }
 
-    // 댓글 삭제
     @Transactional
     public void deleteComment(Long commentId) {
 
@@ -68,8 +69,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    // 특정 post의 댓글 리스트 반환 -> 근데 자식 댓글은 잘 모르겠음..
-    public List<GetCommentResponse> getCommentsByPost(Long postId) {
+    public List<GetCommentResponse> getAllCommentsByPostId(Long postId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 post 입니다."));
