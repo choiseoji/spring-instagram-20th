@@ -29,16 +29,20 @@ public class FollowController {
     }
 
     @GetMapping("/follower")
-    public ResponseEntity<List<GetFollowerResponse>> getMyFollower(@Login Member member) {
+    public ResponseEntity<List<GetFollowerResponse>> getFollowers(
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @Login Member member) {
 
-        List<GetFollowerResponse> responses = followService.getFollower(member);
+        List<GetFollowerResponse> responses = followService.getFollower(memberId, member);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/following")
-    public ResponseEntity<List<GetFollowingResponse>> getMyFollowing(@Login Member member) {
+    public ResponseEntity<List<GetFollowingResponse>> getFollowings(
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @Login Member member) {
 
-        List<GetFollowingResponse> responses = followService.getFollowing(member);
+        List<GetFollowingResponse> responses = followService.getFollowing(memberId, member);
         return ResponseEntity.ok(responses);
     }
 

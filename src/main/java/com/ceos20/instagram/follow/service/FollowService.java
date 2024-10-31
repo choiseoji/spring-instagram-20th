@@ -31,19 +31,25 @@ public class FollowService {
         followRepository.save(follow);
     }
 
-    public List<GetFollowerResponse> getFollower(Member member) {
+    public List<GetFollowerResponse> getFollower(Long memberId, Member member) {
 
-        List<Member> findFollowers = followRepository.findByToMember(member);
+        Long targetMemberId = (memberId != null) ? memberId : member.getId();
+        Member targetMember = memberRepository.findById(targetMemberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
 
+        List<Member> findFollowers = followRepository.findByToMember(targetMember);
         return findFollowers.stream()
                 .map(follower -> GetFollowerResponse.fromEntity(follower))
                 .collect(Collectors.toList());
     }
 
-    public List<GetFollowingResponse> getFollowing(Member member) {
+    public List<GetFollowingResponse> getFollowing(Long memberId, Member member) {
 
-        List<Member> findFollowings = followRepository.findByFromMember(member);
+        Long targetMemberId = (memberId != null) ? memberId : member.getId();
+        Member targetMember = memberRepository.findById(targetMemberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다."));
 
+        List<Member> findFollowings = followRepository.findByFromMember(targetMember);
         return findFollowings.stream()
                 .map(following -> GetFollowingResponse.fromEntity(following))
                 .collect(Collectors.toList());
