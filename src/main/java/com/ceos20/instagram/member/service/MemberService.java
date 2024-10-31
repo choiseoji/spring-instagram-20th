@@ -38,10 +38,10 @@ public class MemberService {
         return member.getId();
     }
 
-    public GetMemberInfoResponse getUserInfoById(Long userId) {
+    public GetMemberInfoResponse getMemberInfoById(Long memberId) {
 
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 user 입니다."));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 member 입니다."));
 
         return GetMemberInfoResponse.fromEntity(member);
     }
