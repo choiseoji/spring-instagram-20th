@@ -22,7 +22,6 @@ public class MessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
 
-    // message 생성
     @Transactional
     public void createMessage(CreateMessageRequest createMessageRequest, Member member) {
 
@@ -33,7 +32,6 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    // 특정 채팅방의 모든 message 리스트 반환
     public List<GetMessageResponse> getMessageInChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 chatRoom 입니다."));
