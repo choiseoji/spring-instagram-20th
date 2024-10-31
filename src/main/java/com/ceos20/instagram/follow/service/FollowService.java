@@ -21,7 +21,6 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
 
-    // 팔로우 관계 생성
     @Transactional
     public void createFollow(Member member, Long friendId) {
 
@@ -32,7 +31,6 @@ public class FollowService {
         followRepository.save(follow);
     }
 
-    // 나를 팔로우하는 사람들 리스트 반환
     public List<GetFollowerResponse> getFollower(Member member) {
 
         List<Member> findFollowers = followRepository.findByToMember(member);
@@ -42,7 +40,6 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
-    // 내가 팔로우하는 사람들 리스트 반환
     public List<GetFollowingResponse> getFollowing(Member member) {
 
         List<Member> findFollowings = followRepository.findByFromMember(member);
@@ -52,7 +49,6 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
-    // 팔로우 관계 삭제
     @Transactional
     public void deleteFollow(Member member, Long friendId) {
 
