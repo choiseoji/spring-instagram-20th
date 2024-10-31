@@ -1,0 +1,48 @@
+package com.ceos20.instagram.member.service;
+
+import com.ceos20.instagram.member.domain.Member;
+import com.ceos20.instagram.member.dto.GetMemberInfoResponse;
+import com.ceos20.instagram.member.dto.SaveMemberRequest;
+import com.ceos20.instagram.member.dto.UpdateMemberInfoRequest;
+import com.ceos20.instagram.member.repository.MemberRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@AllArgsConstructor
+@Transactional(readOnly = true)
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+
+    @Transactional
+    public Long saveUser(SaveMemberRequest saveMemberRequest) {
+
+        Member member = saveMemberRequest.toEntity();
+        return memberRepository.save(member).getId();
+    }
+
+    @Transactional
+    public Long updateMemberInfo(UpdateMemberInfoRequest updateMemberInfoRequest, Member member) {
+
+        member.updateInfo(
+                updateMemberInfoRequest.getUsername(),
+                updateMemberInfoRequest.getNickname(),
+                updateMemberInfoRequest.getPassword(),
+                updateMemberInfoRequest.getEmail(),
+                updateMemberInfoRequest.getImageUrl()
+                );
+        memberRepository.save(member);
+
+        return member.getId();
+    }
+
+    public GetMemberInfoResponse getUserInfoById(Long userId) {
+
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 user 입니다."));
+
+        return GetMemberInfoResponse.fromEntity(member);
+    }
+}

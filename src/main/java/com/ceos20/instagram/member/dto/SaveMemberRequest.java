@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SaveUserRequest {
+public class SaveMemberRequest {
 
     private String username;
 

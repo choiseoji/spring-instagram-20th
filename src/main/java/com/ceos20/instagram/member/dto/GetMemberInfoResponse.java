@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetUserInfoResponse {
+public class GetMemberInfoResponse {
 
     private String username;
 
@@ -20,8 +20,8 @@ public class GetUserInfoResponse {
 
     private String imageUrl;
 
-    public static GetUserInfoResponse fromEntity(Member member) {
-        return GetUserInfoResponse.builder()
+    public static GetMemberInfoResponse fromEntity(Member member) {
+        return GetMemberInfoResponse.builder()
                 .username(member.getUsername())
                 .nickname(member.getNickname())
                 .email(member.getEmail())

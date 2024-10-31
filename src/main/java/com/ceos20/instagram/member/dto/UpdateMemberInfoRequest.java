@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserInfoRequest {
+public class UpdateMemberInfoRequest {
 
     private String username;
 

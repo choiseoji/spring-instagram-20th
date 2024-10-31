@@ -1,8 +1,8 @@
 package com.ceos20.instagram.member.service;
 
 import com.ceos20.instagram.member.domain.Member;
-import com.ceos20.instagram.member.dto.GetUserInfoResponse;
-import com.ceos20.instagram.member.dto.SaveUserRequest;
+import com.ceos20.instagram.member.dto.GetMemberInfoResponse;
+import com.ceos20.instagram.member.dto.SaveMemberRequest;
 import com.ceos20.instagram.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private UserService userService;
+    private MemberService memberService;
 
     private Member testMember;
 
@@ -31,18 +31,18 @@ public class MemberServiceTest {
     @DisplayName("유저 저장 테스트")
     public void saveUserTest() {
         // given
-        SaveUserRequest saveUserRequest = SaveUserRequest.builder()
+        SaveMemberRequest saveMemberRequest = SaveMemberRequest.builder()
                 .username("seoji")
                 .nickname("__seoji")
                 .email("seoji@naver.com")
                 .password("password")
                 .build();
-        Member member = saveUserRequest.toEntity();
+        Member member = saveMemberRequest.toEntity();
 
         when(memberRepository.save(any(Member.class))).thenReturn(member);
 
         // when
-        Long userId = userService.saveUser(saveUserRequest);
+        Long userId = memberService.saveUser(saveMemberRequest);
 
         // then
         verify(memberRepository, times(1)).save(any(Member.class));  // save 메서드가 한번 호출 되었는지 확인
@@ -64,11 +64,11 @@ public class MemberServiceTest {
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
         // when
-        GetUserInfoResponse getUserInfoResponse = userService.getUserInfoById(member.getId());
+        GetMemberInfoResponse getMemberInfoResponse = memberService.getUserInfoById(member.getId());
 
         // then
-        assertEquals(member.getUsername(), getUserInfoResponse.getUsername());
-        assertEquals(member.getNickname(), getUserInfoResponse.getNickname());
-        assertEquals(member.getEmail(), getUserInfoResponse.getEmail());
+        assertEquals(member.getUsername(), getMemberInfoResponse.getUsername());
+        assertEquals(member.getNickname(), getMemberInfoResponse.getNickname());
+        assertEquals(member.getEmail(), getMemberInfoResponse.getEmail());
     }
 }

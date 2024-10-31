@@ -585,13 +585,13 @@ DTO에서 `toEntity()` 메서드를 사용하는 것은 서비스 클래스에�
 
 ```java
  @Transactional
-  public void saveUser(SaveUserRequest saveUserRequest) {
+  public void saveUser(SaveUserRequest saveMemberRequest) {
 
       User member = User.builder()
-              .username(saveUserRequest.getUsername())
-              .nickname(saveUserRequest.getNickname())
-              .password(saveUserRequest.getPassword())
-              .email(saveUserRequest.getEmail())
+              .username(saveMemberRequest.getUsername())
+              .nickname(saveMemberRequest.getNickname())
+              .password(saveMemberRequest.getPassword())
+              .email(saveMemberRequest.getEmail())
               .build();
       memberRepository.save(member);
   }
@@ -625,9 +625,9 @@ public class SaveUserRequest {
 
 ```java
 @Transactional
-public void saveUser(SaveUserRequest saveUserRequest) {
+public void saveUser(SaveUserRequest saveMemberRequest) {
 
-    User member = saveUserRequest.toEntity();
+    User member = saveMemberRequest.toEntity();
     memberRepository.save(member);
 }
 ```
