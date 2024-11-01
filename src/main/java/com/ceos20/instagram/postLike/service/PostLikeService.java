@@ -24,6 +24,7 @@ public class PostLikeService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
+    @Transactional
     public void handlePostLike(Long postId, Long memberId) {
 
         Optional<PostLike> postLike = postLikeRepository.findByMemberIdAndPostId(memberId, postId);
