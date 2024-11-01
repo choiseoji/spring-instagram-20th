@@ -1,5 +1,7 @@
 package com.ceos20.instagram.post.service;
 
+import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.NotFoundException;
 import com.ceos20.instagram.image.domain.Image;
 import com.ceos20.instagram.image.repository.ImageRepository;
 import com.ceos20.instagram.member.repository.MemberRepository;
@@ -51,7 +53,7 @@ public class PostService {
     public void updatePostContent(UpdatePostContentRequest updatePostContentRequest, Long postId) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_POST));
         post.updateContent(updatePostContentRequest.getContent());
         postRepository.save(post);
     }
@@ -60,7 +62,7 @@ public class PostService {
     public void deletePost(Long postId) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_POST));
         postLikeRepository.deleteByPostId(postId);
         postRepository.delete(post);
     }
@@ -68,7 +70,7 @@ public class PostService {
     public GetPostResponse getPostById(Long postId) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_POST));
 
         return GetPostResponse.fromEntity(post);
     }
@@ -76,7 +78,7 @@ public class PostService {
     public List<GetPostResponse> getAllPostsByMemberId(Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 memberId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
         List<Post> posts = postRepository.findByAuthor(member);
 
         return posts.stream()

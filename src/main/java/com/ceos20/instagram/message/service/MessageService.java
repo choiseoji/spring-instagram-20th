@@ -2,6 +2,8 @@ package com.ceos20.instagram.message.service;
 
 import com.ceos20.instagram.chatRoom.domain.ChatRoom;
 import com.ceos20.instagram.chatRoom.repository.ChatRoomRepository;
+import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.NotFoundException;
 import com.ceos20.instagram.message.domain.Message;
 import com.ceos20.instagram.message.dto.CreateMessageRequest;
 import com.ceos20.instagram.message.dto.GetMessageResponse;
@@ -26,7 +28,7 @@ public class MessageService {
     public void createMessage(CreateMessageRequest createMessageRequest, Member member) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(createMessageRequest.getRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 chatRoom 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_CHATROOM));
 
         Message message = createMessageRequest.toEntity(member, chatRoom);
         messageRepository.save(message);
@@ -34,7 +36,7 @@ public class MessageService {
 
     public List<GetMessageResponse> getMessageInChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 chatRoom 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_CHATROOM));
 
         List<Message> messages = messageRepository.findByChatRoom(chatRoom);
         return messages.stream()

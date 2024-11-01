@@ -1,5 +1,7 @@
 package com.ceos20.instagram.member.service;
 
+import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.NotFoundException;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.member.dto.GetMemberInfoResponse;
 import com.ceos20.instagram.member.dto.SaveMemberRequest;
@@ -41,7 +43,7 @@ public class MemberService {
     public GetMemberInfoResponse getMemberInfoById(Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 member 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
 
         return GetMemberInfoResponse.fromEntity(member);
     }

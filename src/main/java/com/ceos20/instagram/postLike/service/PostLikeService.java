@@ -1,5 +1,7 @@
 package com.ceos20.instagram.postLike.service;
 
+import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.NotFoundException;
 import com.ceos20.instagram.post.domain.Post;
 import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.postLike.domain.PostLike;
@@ -42,9 +44,9 @@ public class PostLikeService {
     public void createPostLike(Long postId, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 userId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
 
         PostLike postLike = PostLike.toEntity(member, post);
         postLikeRepository.save(postLike);
