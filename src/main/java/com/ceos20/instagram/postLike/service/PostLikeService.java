@@ -35,12 +35,10 @@ public class PostLikeService {
         }
     }
 
-    @Transactional
     public void deletePostLike(PostLike postLike) {
         postLikeRepository.delete(postLike);
     }
 
-    @Transactional
     public void createPostLike(Long postId, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
