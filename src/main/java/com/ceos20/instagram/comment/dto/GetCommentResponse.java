@@ -15,6 +15,8 @@ public class GetCommentResponse {
 
     private Long commentId;
 
+    private Long parentCommentId;
+
     private String content;
 
     private Long authorId;
@@ -22,8 +24,15 @@ public class GetCommentResponse {
     private String authorNickname;
 
     public static GetCommentResponse fromEntity(Comment comment) {
+
+        Long parentCommentId = null;
+        if (comment.getParentComment() != null) {
+            parentCommentId = comment.getParentComment().getId();
+        }
+
         return GetCommentResponse.builder()
                 .commentId(comment.getId())
+                .parentCommentId(parentCommentId)
                 .content(comment.getContent())
                 .authorId(comment.getAuthor().getId())
                 .authorNickname(comment.getAuthor().getNickname())
