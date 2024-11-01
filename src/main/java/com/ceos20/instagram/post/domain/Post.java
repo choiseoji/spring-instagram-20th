@@ -33,7 +33,7 @@ public class Post {
     private Member author;
 
     @Builder.Default
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Image> images = new ArrayList<>();
 
     public static Post toEntity(CreatePostRequest createPostRequest, Member member) {

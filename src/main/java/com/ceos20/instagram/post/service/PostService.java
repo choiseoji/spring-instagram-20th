@@ -9,6 +9,7 @@ import com.ceos20.instagram.post.dto.GetPostResponse;
 import com.ceos20.instagram.post.dto.UpdatePostContentRequest;
 import com.ceos20.instagram.post.repository.PostRepository;
 import com.ceos20.instagram.member.domain.Member;
+import com.ceos20.instagram.postLike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final ImageRepository imageRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public void createPost(CreatePostRequest createPostRequest, Member member) {
@@ -59,6 +61,7 @@ public class PostService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        postLikeRepository.deleteByPostId(postId);
         postRepository.delete(post);
     }
 
