@@ -17,13 +17,16 @@ public class GetCommentResponse {
 
     private String content;
 
-    private Member author;
+    private Long authorId;
+
+    private String authorNickname;
 
     public static GetCommentResponse fromEntity(Comment comment) {
         return GetCommentResponse.builder()
                 .commentId(comment.getId())
                 .content(comment.getContent())
-                .author(comment.getAuthor())
+                .authorId(comment.getAuthor().getId())
+                .authorNickname(comment.getAuthor().getNickname())
                 .build();
     }
 }
