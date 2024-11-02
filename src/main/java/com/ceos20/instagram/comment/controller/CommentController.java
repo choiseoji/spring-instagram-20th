@@ -4,7 +4,7 @@ import com.ceos20.instagram.comment.dto.CreateCommentRequest;
 import com.ceos20.instagram.comment.dto.GetCommentResponse;
 import com.ceos20.instagram.comment.dto.UpdateCommentRequest;
 import com.ceos20.instagram.comment.service.CommentService;
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

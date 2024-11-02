@@ -1,6 +1,6 @@
 package com.ceos20.instagram.message.controller;
 
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.message.dto.CreateMessageRequest;
 import com.ceos20.instagram.message.dto.GetMessageResponse;

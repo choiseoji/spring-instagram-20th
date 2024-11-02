@@ -2,7 +2,7 @@ package com.ceos20.instagram.chatRoom.controller;
 
 import com.ceos20.instagram.chatRoom.dto.GetChatRoomIdResponse;
 import com.ceos20.instagram.chatRoom.service.ChatRoomService;
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,6 @@
 package com.ceos20.instagram.postLike.controller;
 
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.postLike.dto.GetUserLikeResponse;
 import com.ceos20.instagram.postLike.service.PostLikeService;

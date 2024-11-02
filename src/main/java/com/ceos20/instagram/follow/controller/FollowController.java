@@ -3,7 +3,7 @@ package com.ceos20.instagram.follow.controller;
 import com.ceos20.instagram.follow.dto.GetFollowerResponse;
 import com.ceos20.instagram.follow.dto.GetFollowingResponse;
 import com.ceos20.instagram.follow.service.FollowService;
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

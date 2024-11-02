@@ -1,4 +1,4 @@
-package com.ceos20.instagram.global.annotation;
+package com.ceos20.instagram.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

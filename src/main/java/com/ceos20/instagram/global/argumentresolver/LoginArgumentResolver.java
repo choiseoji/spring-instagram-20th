@@ -1,6 +1,6 @@
 package com.ceos20.instagram.global.argumentresolver;
 
-import com.ceos20.instagram.global.annotation.Login;
+import com.ceos20.instagram.common.annotation.Login;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
