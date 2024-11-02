@@ -46,7 +46,7 @@ public class PostLikeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_POST));
 
         PostLike postLike = PostLike.toEntity(member, post);
         postLikeRepository.save(postLike);
