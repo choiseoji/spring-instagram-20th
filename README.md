@@ -1014,3 +1014,336 @@ public class FollowServiceTest {
 
 - `when(followRepository.findByToUser(member)).thenReturn(followers)` 을 통해 모의 객체인 followRepository의 예상 동작을 정의한다.
     - 'followRepository의 findByToUser메서드의 매개변수로 user가 넘어오면, followers를 반환해라' 라는 의미이다.
+
+<br/>
+
+----
+## 4주차 CRUD API 만들기
+
+4주차 과제는 CRUD API 만들기였는데 새롭게 알게된 점과 코드를 작성하며 고민했던 부분 위주로 README를 작성해보았습니다!
+
+## 💡 전역 예외 처리 (GlobalExceptionHandler)
+
+```java
+@Transactional
+public void deletePost(Long postId) {
+
+    Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 post입니다"));
+    postLikeRepository.deleteByPostId(postId);
+    postRepository.delete(post);
+}
+```
+
+기존에는 유효하지 않은 post id를 받은 경우, IllegalArgumentException을 통해 예외를 던져주었다.
+
+이 코드에서 한번 생각해 볼 수 있었던 것은
+
+**1. 문제 상황 : 500 에러**
+
+<img width="572" alt="스크린샷 2024-11-03 오후 12 52 29" src="https://github.com/user-attachments/assets/5aba4eea-9223-4c65-873d-07e35b2a922d">
+
+IllegalArgumentException을 던져 예외 처리를 했지만, 프론트가 받는 응답에는 500 Internal Server Error만 나타나게 된다.
+
+이 경우 프론트에서 예외 처리를 하기 어렵겠다고 생각했고, 사용자 입장에서도 실제로는 리소스를 찾지 못 해 발생한 에러이지만 500 서버 에러가 발생해 혼란을 줄 수 있다고 생각했다.
+
+<br/>
+
+**2. 초기 해결방법 : try-catch**
+
+```java
+try {
+    // 비즈니스 로직
+} catch (IllegalArgumentException e) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.failure("존재하지 않는 post 입니다"));
+}
+```
+
+컨트롤러마다 에러를 catch 해 예외에 따라 적절한 상태 코드와 응답을 만들어주는 방법을 생각했다.
+
+→ **하지만 이 방법은 예외 처리 코드가 너무 반복될 것 같은..문제점이 있다.**
+
+<br/>
+
+**3. 최종 해결방법 : 전역 예외 처리**기
+
+코드가 반복되는 비효율을 줄이기 위해 **전역 예외 처리기**를 도입하기로 했다.
+
+모든 컨트롤러에 적용되는 공통 예외 처리를 한 곳에 모아놓는 **중앙집중화** 된 방식으로 코드의 중복없이 일관된 응답 형식을 제공할 수 있다는 장점이 있다.
+
+그럼 이제 전역 예외 처리를 하기 위해 필요한 코드를 살펴보도록 하자!
+
+<br/>
+
+### 1. ExceptionCode
+
+```java
+@Getter
+public enum ExceptionCode {
+
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "해당 member는 존재하지 않습니다."),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 post는 존재하지 않습니다."),
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "해당 comment는 존재하지 않습니다."),
+    NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "해당 image는 존재하지 않습니다."),
+    NOT_FOUND_POSTLIKE(HttpStatus.NOT_FOUND, "해당 postlike는 존재하지 않습니다."),
+    NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "해당 chatroom은 존재하지 않습니다."),
+    NOT_FOUND_MESSAGE(HttpStatus.NOT_FOUND, "해당 message는 존재하지 않습니다.");
+
+    private final HttpStatus status;
+    private final String message;
+
+    ExceptionCode(final HttpStatus status, final String message) {
+        this.status = status;
+        this.message = message;
+    }
+}
+```
+
+- **예외 상태** 와 **예외 메시지** 를 관리하기 위한 ENUM 클래스이다.
+- 특정 리소스가 없는 경우 클라이언트에게 보낼 예외의 상태 코드와 메시지를 정의할 수 있다.
+    - NOT_FOUND 이외에도 BAD_REQUEST같은 다양한 예외 상황을 정의할 수 있다.
+
+<br/>
+
+### 2. NotFoundException
+
+```java
+public class NotFoundException extends RuntimeException{
+
+    private final ExceptionCode exceptionCode;
+
+    public NotFoundException(ExceptionCode exceptionCode) {
+        super(exceptionCode.getMessage());
+        this.exceptionCode = exceptionCode;
+    }
+
+    public HttpStatus getStatus() {
+        return exceptionCode.getStatus();
+    }
+
+    public String getMessage() {
+        return exceptionCode.getMessage();
+    }
+}
+```
+
+- NotFoundException 이라는 사용자 정의 예외 클래스를 정의했다.
+- 특정 ExceptionCode를 기반으로 예외를 발생시키며, 각 예외에 맞는 HTTP 상태 코드와 메시지를 제공하는 역할을 한다.
+
+<br/>
+
+### 3. GlobalExceptionHandler
+
+**🧐 GlobalExceptionHandler란??**
+
+여기가 바로 애플리케이션 전반에서 발생하는 예외들을 한 곳에서 처리하기 위한 전역 예외 처리기이다.
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(final NotFoundException e) {
+
+        ExceptionResponse exceptionResponse = ExceptionResponse.from(e);
+        ApiResponse<Void> apiResponse = ApiResponse.failure(exceptionResponse);
+
+        return ResponseEntity
+                .status(exceptionResponse.getStatus())
+                .body(apiResponse);
+    }
+}
+```
+
+- `@RestControllerAdvice`와 `@ExceptionHandler` 를 사용해, 특정 예외 발생 시 일관된 형식으로 응답을 반환하는 역할을 한다.
+    - `@RestControllerAdvice` : `@Controller` + `@ResponseBody` 로 모든 컨트롤러에서 발생하는 예외를 전역적으로 처리하는 클래스 임을 나타낸다. ⇒ **여기가 바로 중앙 집중화를 가능하게 해주는 부분!**
+    - `@ExceptionHandler(NotFoundException.class)` : NotFoundException이 발생했을 때, 이 메서드가 호출되도록 지정한다.
+
+```java
+@Transactional
+public void deletePost(Long postId) {
+
+    Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_POST));
+    postLikeRepository.deleteByPostId(postId);
+    postRepository.delete(post);
+}
+```
+
+이제 예외 발생 상황에서 NotFoundException을 던져주면, 먼저 코드를 호출한 부분으로 돌아가는데 컨트롤러에서 예외 처리를 따로 하지 않으므로 GlobalExceptionHandler가 예외를 잡게 된다.
+
+GlobalExceptionHandler의 `handleNotFoundException` 메서드가 실행되어 예외 정보를 response에 담아 클라이언트에게 반환한다.
+
+<br/>
+
+## 💡 ResponseEntity VS 공통 응답 형식
+
+<img width="580" alt="스크린샷 2024-11-03 오후 2 58 57" src="https://github.com/user-attachments/assets/ce4c941d-db5b-444f-bb8a-5ae51521c029">
+
+HTTP 응답 메시지를 살펴보면
+
+HTTP 상태 코드, 헤더, 애플리케이션에서 처리한 데이터 등을 response에 담아줘야 하는데..
+
+우리는 이런 정보를 어떻게 응답할 수 있을까?
+
+<br/>
+
+### 1. ResponseEntity 사용하기
+
+**HttpEntity**
+
+<img width="564" alt="스크린샷 2024-11-03 오후 2 52 06" src="https://github.com/user-attachments/assets/c2754545-7389-4e99-b5d7-7e7cd208b50a">
+
+먼저 스프링은 HttpEntity라는 클래스를 제공하는데 HttpHeader와 HttpBody를 포함하고 있다.
+
+<br/>
+
+**ResponseEntity**
+
+<img width="459" alt="스크린샷 2024-11-03 오후 2 51 38" src="https://github.com/user-attachments/assets/f524eb86-16a4-4ac8-9cbc-e00368d937ab">
+
+ResponseEntity 클래스는 HttpEntity를 상속받아 사용하고 HttpStatusCode를 포함하고 있다.
+
+따라서 우리는 **ResponseEntity** 클래스를 사용해 http status, header, body를 전부 담아 클라이언트에게 응답할 수 있는 것이다!
+
+```java
+@GetMapping("/{postId}")
+public ResponseEntity<GetPostResponse> getPostById(@PathVariable Long postId) {
+    GetPostResponse getPostResponse = postService.getPostById(postId);
+    
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(getPostResponse);
+}
+```
+
+🚨 **이 경우에 문제점은 성공했을 때와 실패 했을 때의 응답 형식이 다르다는 것이다.**
+
+응답 형식이 다르다면 프론트에서 예외 처리를 하기 어려워질 것이다. 이를 어떻게 해결하면 좋을까?
+
+### 2. 공통 응답 형식
+
+response를 공통된 형식으로 반환하는 방법이 있다.
+
+```java
+@Getter
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class ApiResponse<T> {
+
+    private static final String SUCCESS_STATUS = "success";
+    private static final String FAIL_STATUS = "fail";
+    private static final String ERROR_STATUS = "error";
+
+    private final String status;
+    private final String message;
+    private final T data;
+
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>(SUCCESS_STATUS, message, data);
+    }
+
+    public static <T> ApiResponse<T> failure(ExceptionResponse error) {
+        return new ApiResponse<>(ERROR_STATUS, error.getMessage(), null);
+    }
+}
+```
+
+위의 코드 처럼 status, message, data 세개의 필드를 갖는 ApiResponse를 반환하면 요청 성공, 실패 모두 같은 형식의 response를 받을 수 있게 된다.
+
+<img width="448" alt="스크린샷 2024-11-02 오후 5 19 01" src="https://github.com/user-attachments/assets/39eb7d7a-cac6-4f66-80b3-6f07ac04371b">
+
+<img width="486" alt="스크린샷 2024-11-02 오후 5 18 49" src="https://github.com/user-attachments/assets/58c3106a-7f7b-46d2-a480-eddf560a98a8">
+
+<br/>
+
+### 🧐 그러면 둘 중에 무엇을 사용하는게 더 좋을까??
+
+- ResponseEntity의 장점
+    - 정교하게 HttpStatus를 조절하여 그 값을 실제로 HttpStatus에 반영 가능하다
+- ResponseEntity의 단점
+    - 성공 시와 실패 했을 때의 응답 형식이 다르다
+- 공통 응답 형식의 장점
+    - 공통된 형식으로 응답할 수 있어 프론트에서 예외 처리하기 쉬워진다
+- 공통 응답 형식의 단점
+    - 정교한 HttpStatus를 설정하기 까다로울 수 있다
+
+이렇게 각각 장단점이 존재하여…프론트와 협의해서 사용하면 된다고 생각한다. 
+
+응답에 맞는 정교한 HttpStatus가 중요하다고 생각해 ResponseEntity와 공통 응답 형식 모두 사용해줬다 
+
+```java
+@GetMapping("/{postId}")
+public ResponseEntity<ApiResponse<GetPostResponse>> getPostById(@PathVariable Long postId) {
+
+    GetPostResponse getPostResponse = postService.getPostById(postId);
+    return ResponseBuilder.createApiResponse("게시글 단건 조회 완료", getPostResponse);
+}
+```
+
+ApiResponse라는 공통 형식의 클래스를 만들어 ResponseEntity의 body에 담아 반환했다. 
+
+<br/>
+
+## 💡 @Login 커스튬 어노테이션
+
+나중에 jwt 로그인을 구현하면 모든 요청마다 인증 검증 로직을 작성해야 되는데, 이를 간편하게 처리하고 바로 로그인 된 사용자를 주입받기 위해 `@Login` 이라는 커스튬 어노테이션을 만들어줬다.
+
+```java
+@Target(ElementType.PARAMETER)   // 이 어노테이션이 메서드의 파라미터에서만 적용될 수 있도록 함
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Login {
+}
+```
+
+```java
+@Component
+public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
+
+	  @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+
+        boolean hasLoginAnnotation = parameter.hasParameterAnnotation(Login.class);
+        boolean isMemberType = parameter.getParameterType().equals(Member.class);
+        return hasLoginAnnotation && isMemberType;
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+
+        // 추후 jwt로 현재 로그인한 Member 찾아 반환할 예정
+        return member;
+    }
+}
+```
+
+<br/>
+
+**HandlerMethodArgumentResolver 인터페이스**
+
+- 스프링 MVC에서 컨트롤러 메서드의 파라미터를 처리하기 위해 사용하는 인터페이스이다.
+- 컨트롤러 메서드의 파라미터로 **특정 객체를 자동으로 주입**할 수 있다.
+
+<br/>
+
+주로 두가지 메서드로 이루어져 있는데
+
+- supportsParameter
+    - 특정 파라미터가 처리 대상인지 결정하는 메서드이다.
+    - 이 메서드는 boolean을 반환하고, true 일 경우 스프링이 이 파라미터에 대해 resolveArgument 메서드를 사용하도록 한다.
+    - ex) 위의 코드를 보면 파라미터에 붙은 어노테이션이 맞는지, 파라미터의 타입이 Member가 맞는지 검사하고 있다
+- resolveArgument
+    - 실제로 파라미터에 전달할 객체를 생성하고 반환한다.
+
+```java
+@PostMapping
+public ResponseEntity<ApiResponse<Void>> createPost(
+        @RequestBody CreatePostRequest createPostRequest,
+        @Login Member member) {
+
+    postService.createPost(createPostRequest, member);
+    return ResponseBuilder.createApiResponse("게시글 작성 완료", null);
+}
+```
+
+나중에 `resolveArgument` 메서드에 토큰을 검사해 현재 로그인 된 회원 정보를 가져오고, DB에서 조회해 반환하는 로직을 작성하면, 컨트롤러 메서드에서 `@Login` 어노테이션을 붙여 **로그인된 member 정보를 바로 주입**받을 수 있게 된다.
