@@ -1,4 +1,4 @@
-package com.ceos20.instagram.global.security.dto;
+package com.ceos20.instagram.global.jwt.dto;
 
 import lombok.Builder;
 import lombok.Getter;
