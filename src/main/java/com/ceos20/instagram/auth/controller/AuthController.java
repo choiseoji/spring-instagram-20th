@@ -5,9 +5,13 @@ import com.ceos20.instagram.auth.dto.SignUpRequest;
 import com.ceos20.instagram.auth.service.AuthService;
 import com.ceos20.instagram.common.response.ApiResponse;
 import com.ceos20.instagram.common.response.ResponseBuilder;
+import com.ceos20.instagram.global.jwt.JwtTokenProvider;
 import com.ceos20.instagram.global.jwt.dto.JwtToken;
+import com.ceos20.instagram.member.domain.Member;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/signUp")
     private ResponseEntity<ApiResponse<Void>> signUp(@RequestBody SignUpRequest signUpRequest) {
@@ -32,5 +37,16 @@ public class AuthController {
 
         JwtToken token = authService.signIn(signInRequest);
         return ResponseBuilder.createApiResponse("로그인 성공", token);
+    }
+
+    @PostMapping("/reissue")
+    private ResponseEntity<ApiResponse<JwtToken>> reissue(HttpServletRequest request) {
+
+        String refreshToken = request.getHeader("refreshToken");
+        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+        Member member = jwtTokenProvider.getMemberFromAuthentication(authentication);
+
+        JwtToken token = jwtTokenProvider.reissue(member, refreshToken);
+        return ResponseBuilder.createApiResponse("accessToken 재발급 성공", token);
     }
 }
