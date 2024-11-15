@@ -1,6 +1,6 @@
 package com.ceos20.instagram.global.jwt;
 
-가import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.ExceptionCode;
 import com.ceos20.instagram.global.exception.InvalidTokenException;
 import com.ceos20.instagram.global.jwt.dto.JwtToken;
 import com.ceos20.instagram.member.domain.Member;
