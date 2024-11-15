@@ -1,7 +1,10 @@
 package com.ceos20.instagram.global.jwt;
 
+가import com.ceos20.instagram.global.exception.ExceptionCode;
+import com.ceos20.instagram.global.exception.InvalidTokenException;
 import com.ceos20.instagram.global.jwt.dto.JwtToken;
 import com.ceos20.instagram.member.domain.Member;
+import com.ceos20.instagram.member.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +24,8 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
+
+    private final MemberRepository memberRepository;
 
     private final UserDetailsService userDetailsService;
     private final String secretKey = generateSecretKey();
@@ -107,24 +112,24 @@ public class JwtTokenProvider {
     /**
      * 토큰 유효성 검사
      * @param token accessToken
-     * @return 유효하면 true, 유효하지 않으면 false 반환
+     * @return 토큰이 유효하고 만료되지 않은 경우 true를 반환
+     * @throws InvalidTokenException 토큰이 만료되었거나 유효하지 않은 경우
      */
     public boolean validateToken(String token) {
         try {
+
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+
             return claims.getBody().getExpiration().after(new Date());
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            System.out.println("토큰이 만료되었습니다: " + e.getMessage());
+            throw new InvalidTokenException(ExceptionCode.EXPIRED_TOKEN);
         } catch (io.jsonwebtoken.SignatureException e) {
-            System.out.println("서명이 유효하지 않습니다: " + e.getMessage());
+            throw new InvalidTokenException(ExceptionCode.INVALID_SIGNATURE);
         } catch (io.jsonwebtoken.MalformedJwtException e) {
-            System.out.println("잘못된 JWT 형식입니다: " + e.getMessage());
+            throw new InvalidTokenException(ExceptionCode.MALFORMED_TOKEN);
         } catch (IllegalArgumentException e) {
-            System.out.println("토큰이 비어있거나 잘못된 형식입니다: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("알 수 없는 오류가 발생했습니다: " + e.getMessage());
+            throw new InvalidTokenException(ExceptionCode.ILLEGAL_ARGUMENT);
         }
-        return false;
     }
 
     /**
@@ -145,4 +150,32 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+
+    /**
+     * 만료된 accessToken을 재발급
+     * @param member 토큰을 재발급받을 사용자 정보가 담긴 Member 객체
+     * @param refreshToken 현재 사용자의 refreshToken
+     * @return 새로운 accessToken과, 필요한 경우 갱신된 refreshToken이 포함된 JwtToken 객체
+     */
+    public JwtToken reissue(Member member, String refreshToken) {
+
+        String newAccessToken = createAccessToken(member);
+
+        if (!validateToken(refreshToken)) {
+            refreshToken = createRefreshToken(member);
+        }
+
+        return JwtToken.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public Member getMemberFromAuthentication(Authentication authentication) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String nickname = userDetails.getUsername();
+
+        return memberRepository.findByNickname(nickname).orElse(null);
+    }
 }
