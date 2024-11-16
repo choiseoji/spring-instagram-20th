@@ -8,6 +8,8 @@ import com.ceos20.instagram.global.jwt.JwtTokenProvider;
 import com.ceos20.instagram.global.jwt.dto.JwtToken;
 import com.ceos20.instagram.member.domain.Member;
 import com.ceos20.instagram.member.service.MemberService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +39,7 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtToken signIn(SignInRequest signInRequest) {
+    public void signIn(SignInRequest signInRequest, HttpServletResponse response) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -45,6 +47,17 @@ public class AuthService {
                         signInRequest.getPassword()));
 
         Member member = memberService.getMemberByNickname(signInRequest.getNickname());
-        return jwtTokenProvider.getToken(member);
+        JwtToken token = jwtTokenProvider.getToken(member);
+
+        // 헤더 : accessToken
+        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
+
+        // 쿠키 : refreshToken
+        Cookie refreshCookie = new Cookie("refreshToken", token.getRefreshToken());
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
+        response.addCookie(refreshCookie);
     }
 }

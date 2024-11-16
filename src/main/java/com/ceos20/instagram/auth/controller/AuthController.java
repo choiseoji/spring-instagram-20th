@@ -9,6 +9,7 @@ import com.ceos20.instagram.global.jwt.JwtTokenProvider;
 import com.ceos20.instagram.global.jwt.dto.JwtToken;
 import com.ceos20.instagram.member.domain.Member;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -33,10 +34,12 @@ public class AuthController {
     }
 
     @PostMapping("/signIn")
-    private ResponseEntity<ApiResponse<JwtToken>> signIn(@RequestBody SignInRequest signInRequest) {
+    private ResponseEntity<ApiResponse<JwtToken>> signIn(
+            @RequestBody SignInRequest signInRequest,
+            HttpServletResponse response) {
 
-        JwtToken token = authService.signIn(signInRequest);
-        return ResponseBuilder.createApiResponse("로그인 성공", token);
+        authService.signIn(signInRequest, response);
+        return ResponseBuilder.createApiResponse("로그인 성공", null);
     }
 
     @PostMapping("/reissue")
