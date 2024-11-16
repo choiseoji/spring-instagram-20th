@@ -43,13 +43,11 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    private ResponseEntity<ApiResponse<JwtToken>> reissue(HttpServletRequest request) {
+    private ResponseEntity<ApiResponse<Void>> reissue(
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
-        String refreshToken = request.getHeader("refreshToken");
-        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
-        Member member = jwtTokenProvider.getMemberFromAuthentication(authentication);
-
-        JwtToken token = jwtTokenProvider.reissue(member, refreshToken);
-        return ResponseBuilder.createApiResponse("accessToken 재발급 성공", token);
+        jwtTokenProvider.reissue(request, response);
+        return ResponseBuilder.createApiResponse("accessToken 재발급 성공", null);
     }
 }

@@ -9,7 +9,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -150,25 +152,18 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public void reissue(HttpServletRequest request, HttpServletResponse response) {
 
-    /**
-     * 만료된 accessToken을 재발급
-     * @param member 토큰을 재발급받을 사용자 정보가 담긴 Member 객체
-     * @param refreshToken 현재 사용자의 refreshToken
-     * @return 새로운 accessToken과, 필요한 경우 갱신된 refreshToken이 포함된 JwtToken 객체
-     */
-    public JwtToken reissue(Member member, String refreshToken) {
-
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        Authentication authentication = getAuthentication(refreshToken);
+        Member member = getMemberFromAuthentication(authentication);
         String newAccessToken = createAccessToken(member);
 
         if (!validateToken(refreshToken)) {
             refreshToken = createRefreshToken(member);
+            setRefreshTokenToCookie(refreshToken, response);
         }
-
-        return JwtToken.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .build();
+        response.setHeader("Authorization", "Bearer " + newAccessToken);
     }
 
     public Member getMemberFromAuthentication(Authentication authentication) {
@@ -177,5 +172,26 @@ public class JwtTokenProvider {
         String nickname = userDetails.getUsername();
 
         return memberRepository.findByNickname(nickname).orElse(null);
+    }
+
+    public String extractRefreshTokenFromCookie(HttpServletRequest request) {
+
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                return cookie.getValue();
+            }
+        }
+        throw new InvalidTokenException(ExceptionCode.NOT_FOUND_REFRESH_TOKEN);
+    }
+
+    public void setRefreshTokenToCookie(String refreshToken, HttpServletResponse response) {
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
+        response.addCookie(refreshCookie);
     }
 }

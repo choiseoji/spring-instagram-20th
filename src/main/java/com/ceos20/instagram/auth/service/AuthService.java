@@ -53,11 +53,6 @@ public class AuthService {
         response.setHeader("Authorization", "Bearer " + token.getAccessToken());
 
         // 쿠키 : refreshToken
-        Cookie refreshCookie = new Cookie("refreshToken", token.getRefreshToken());
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(7 * 24 * 60 * 60 * 1000);
-        response.addCookie(refreshCookie);
+        jwtTokenProvider.setRefreshTokenToCookie(token.getRefreshToken(), response);
     }
 }
