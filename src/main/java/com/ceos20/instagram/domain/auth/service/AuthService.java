@@ -38,6 +38,18 @@ public class AuthService {
     }
 
     @Transactional
+    public void adminSignUp(SignUpRequest signUpRequest) {
+
+        if (memberService.nicknameAlreadyExists(signUpRequest.getNickname()))
+            throw new ConflictException(ExceptionCode.ALREADY_EXISTS_NICKNAME);
+
+        if (memberService.emailAlreadyExists(signUpRequest.getEmail()))
+            throw new ConflictException(ExceptionCode.ALREADY_EXISTS_MEMBER);
+
+        memberService.saveAdmin(signUpRequest);
+    }
+
+    @Transactional
     public void signIn(SignInRequest signInRequest, HttpServletResponse response) {
 
         Authentication authentication = authenticationManager.authenticate(

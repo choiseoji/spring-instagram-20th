@@ -28,7 +28,14 @@ public class AuthController {
     private ResponseEntity<ApiResponse<Void>> signUp(@RequestBody SignUpRequest signUpRequest) {
 
         authService.signUp(signUpRequest);
-        return ResponseBuilder.createApiResponse("회원가입 성공", null);
+        return ResponseBuilder.createApiResponse("일반 사용자 회원가입 성공", null);
+    }
+
+    @PostMapping("/admin/signUp")
+    private ResponseEntity<ApiResponse<Void>> adminSignUp(@RequestBody SignUpRequest signUpRequest) {
+
+        authService.adminSignUp(signUpRequest);
+        return ResponseBuilder.createApiResponse("관리자 회원가입 성공", null);
     }
 
     @PostMapping("/signIn")

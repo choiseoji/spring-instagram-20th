@@ -30,7 +30,7 @@ public class Member {
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    private MemberRole role = MemberRole.MEMBER;
+    private MemberRole role;
 
 
     // user 정보 수정
@@ -40,5 +40,13 @@ public class Member {
         this.password = password;
         this.email = email;
         this.imageUrl = imageUrl;
+    }
+
+    public void setRoleMember() {
+        this.role = MemberRole.MEMBER;
+    }
+
+    public void setRoleAdmin() {
+        this.role = MemberRole.ADMIN;
     }
 }

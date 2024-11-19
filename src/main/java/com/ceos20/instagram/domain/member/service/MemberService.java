@@ -24,6 +24,15 @@ public class MemberService {
     public void saveMember(SignUpRequest signUpRequest) {
 
         Member member = signUpRequest.toEntity(passwordEncoder);
+        member.setRoleMember();
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void saveAdmin(SignUpRequest signUpRequest) {
+
+        Member member = signUpRequest.toEntity(passwordEncoder);
+        member.setRoleAdmin();
         memberRepository.save(member);
     }
 
